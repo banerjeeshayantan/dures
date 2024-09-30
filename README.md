@@ -2,24 +2,28 @@
 
 ## Introduction
 
-This package provides easy-to-implement functions to denoise tandem mass spectrometry data. It requires a set of mzML files and a txt file containing feature information (from standard peak picking algorithms) with m/z and RT as input and outputs a set of mzML files with the denoised MS/MS spectra to a user-defined directory. 
+This package provides easy-to-implement functions to denoise tandem mass spectrometry data. It requires a set of mzML files and a txt file containing feature information (from standard untargeted metabolomics software), such as the precursor mz and RT as input. It outputs a set of mzML files with the same number of samples but containing denoised MS/MS spectra. 
 
 ## Installation
 
 First, you need to install two dependencies from Bioconductor: S4Vectors and Spectra
 ```r
 install.packages("BiocManager")
-BiocManager::install(c("Spectra", "S4Vectors"))
+BiocManager::install(c("Spectra", "S4Vectors", "mzR"))
 ```
 After this you can proceed with the installation of the development version of the package DuReS as follows:
 
 ```r
 install.packages("devtools")
-devtools::install_github("banerjeeshayantan/dures")
+devtools::install_github("BiosystemEngineeringLab-IITB/dures")
 ```
 
 ## Documentation
-Detailed documentation of the package is available [here](https://banerjeeshayantan.github.io/dures/)
+Detailed description of all the functions included within the package is available [here](https://biosystemengineeringlab-iitb.github.io/dures/reference/index.html). A vignette outlining how to run DuReS using several test datasets is available [here](https://biosystemengineeringlab-iitb.github.io/dures/articles/dures-vignette.html).
+
+## Test Datasets
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13778168.svg)](https://doi.org/10.5281/zenodo.13778168)
+
 
 ## Quick Start
 ```r
@@ -44,5 +48,4 @@ l5 = generate_denoised_spectra(l4, folder_path, ion_mode = "pos")
 ![Workflow Diagram](https://raw.githubusercontent.com/banerjeeshayantan/test_read_the_docs_tut/main/dures_workflow.png)
 
 ## Citation
-Please cite the following paper if you use our package
-
+Banerjee, Shayantan, Prajval Nakrani, Aviral Singh, and Pramod Wangikar. "DuReS: An R package for denoising experimental tandem mass spectrometry-based metabolomics data." [bioRxiv](https://www.biorxiv.org/content/10.1101/2024.09.16.613198v1) (2024): 2024-09.

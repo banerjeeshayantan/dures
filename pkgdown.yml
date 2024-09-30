@@ -3,6 +3,8 @@ authors:
   - name: "Shayantan Banerjee"
     role: "aut, cre"
     email: "banerjeeshayantan@gmail.com"
+    url: "https://BiosystemEngineeringLab-IITB.github.io/dures"
+
 
 
 pkgdown:
@@ -14,12 +16,15 @@ navbar:
   left:
     - text: "Home"
       href: index.html
-    - text: "Reference"
+    - text: "Function Description"
       href: reference/index.html
-    - text: "Articles"
+    - text: "Vignette"
       href: articles/index.html
     - text: "News"
       href: news/index.html
   right:
     - icon: fa-github
-      href: https://github.com/banerjeeshayantan/dures
+      href: https://github.com/BiosystemEngineeringLab-IITB/dures
+
+reference:
+  - title: "Function Description"  # Customize the title here

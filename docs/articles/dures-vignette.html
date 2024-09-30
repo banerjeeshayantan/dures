@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">dures</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.1</span>
       </span>
     </div>
 
@@ -72,7 +72,7 @@
                         <h4 data-toc-skip class="author">Shayantan
 Banerjee</h4>
             
-            <h4 data-toc-skip class="date">2024-07-15</h4>
+            <h4 data-toc-skip class="date">2024-09-25</h4>
       
       
       <div class="hidden name"><code>dures-vignette.Rmd</code></div>
@@ -81,244 +81,123 @@ Banerjee</h4>
 
     
     
-<p>Vignettes are long form documentation commonly included in packages.
-Because they are part of the distribution of the package, they need to
-be as compact as possible. The <code>html_vignette</code> output type
-provides a custom style sheet (and tweaks some options) to ensure that
-the resulting html is as small as possible. The
-<code>html_vignette</code> format:</p>
+<p>The <strong>Denoising Using Replicate Spectra (DuReS)</strong>
+package requires the following input parameters:</p>
 <ul>
-<li>Never uses retina figures</li>
-<li>Has a smaller default figure size</li>
-<li>Uses a custom CSS stylesheet instead of the default Twitter
-Bootstrap style</li>
+<li>A folder path to store all the data and analysis results.</li>
+<li>A folder named <code>mzml_files/</code> within the above folder
+path, containing files in the mzML format.</li>
+<li>A features file containing a list of MS/MS features derived from
+standard untargeted metabolomics analysis software. This file must
+satisfy one of the following requirements:
+<ul>
+<li>
+<strong>Option 1</strong>: A single file named
+<code>feature_list.txt</code> with columns “ID”, “mz”, and “RT”. In this
+case, a fixed but customizable RT and mz tolerance will be used to
+extract the MS/MS spectra.</li>
+<li>
+<strong>Option 2</strong>: Both:
+<ul>
+<li>A <code>feature_list.txt</code> file in the format described above,
+and</li>
+<li>A RT tolerance file named
+<code>Sample-and_feature-wise-RT-tolerance.txt</code> containing custom
+RT tolerances for each sample. For example:
+<ul>
+<li>If there are two samples (<code>sample_1</code> and
+<code>sample_2</code>), the
+<code>Sample-and_feature-wise-RT-tolerance.txt</code> file should have
+the same number of rows as <code>feature_list.txt</code>.</li>
+<li>The column names should be formatted as
+<code>RT_min_sample_1</code>, <code>RT_min_sample_2</code>,
+<code>RT_max_sample_1</code>, and <code>RT_max_sample_2</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 <div class="section level2">
-<h2 id="vignette-info">Vignette Info<a class="anchor" aria-label="anchor" href="#vignette-info"></a>
+<h2 id="test-datasets">Test Datasets<a class="anchor" aria-label="anchor" href="#test-datasets"></a>
 </h2>
-<p>Note the various macros within the <code>vignette</code> section of
-the metadata block above. These are required in order to instruct R how
-to build the vignette. Note that you should change the
-<code>title</code> field and the <code>\VignetteIndexEntry</code> to
-match the title of your vignette.</p>
+<p>All the test datasets used in this vignette are hosted at <a href="https://zenodo.org/records/13778168" class="external-link">https://zenodo.org/records/13778168</a>.
+Users need to download the file and unzip the folder contents on their
+local system.</p>
+<ul>
+<li><p>The <code>test_1</code> folder contains a folder named
+<code>mzml_files/</code> and two files:
+<code>Sample-and-feature-wise-RT-tolerance.txt</code> and
+<code>feature_list.txt</code>. The <code>feature_list.txt</code> file
+has three columns: “ID”, “mz”, and “RT”. The additional file
+<code>Sample-and-feature-wise-RT-tolerance.txt</code> contains the
+sample-wise RT tolerances for all features. The number of rows in both
+files is the same, while the
+<code>Sample-and-feature-wise-RT-tolerance.txt</code> file has twice as
+many columns as <code>feature_list.txt</code>, with <code>RT_min_</code>
+and <code>RT_max_</code> appended to every sample name.</p></li>
+<li><p>The <code>test_2</code> and <code>test_3</code> folders each
+contain a folder named <code>mzml_files/</code> and a file named
+<code>feature_list.txt</code>.</p></li>
+</ul>
 </div>
 <div class="section level2">
-<h2 id="styles">Styles<a class="anchor" aria-label="anchor" href="#styles"></a>
+<h2 id="install-the-dependencies">Install the dependencies<a class="anchor" aria-label="anchor" href="#install-the-dependencies"></a>
 </h2>
-<p>The <code>html_vignette</code> template includes a basic CSS theme.
-To override this theme you can specify your own CSS in the document
-metadata as follows:</p>
-<pre><code><span><span class="va">output</span><span class="op">:</span> </span>
-<span>  <span class="fu">rmarkdown</span><span class="fu">::</span><span class="va"><a href="https://pkgs.rstudio.com/rmarkdown/reference/html_vignette.html" class="external-link">html_vignette</a></span><span class="op">:</span></span>
-<span>    <span class="va">css</span><span class="op">:</span> <span class="va">mystyles.css</span></span></code></pre>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Dependencies</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Spectra"</span>, <span class="st">"S4Vectors"</span>, <span class="st">"mzR"</span><span class="op">)</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"devtools"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="figures">Figures<a class="anchor" aria-label="anchor" href="#figures"></a>
+<h2 id="install-the-package">Install the package<a class="anchor" aria-label="anchor" href="#install-the-package"></a>
 </h2>
-<p>The figure sizes have been customised so that you can easily put two
-images side-by-side.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fl">10</span><span class="op">:</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dures-vignette_files/figure-html/unnamed-chunk-1-1.png" width="700"><img src="dures-vignette_files/figure-html/unnamed-chunk-1-2.png" width="700"></p>
-<p>You can enable figure captions by <code>fig_caption: yes</code> in
-YAML:</p>
-<pre><code><span><span class="va">output</span><span class="op">:</span></span>
-<span>  <span class="fu">rmarkdown</span><span class="fu">::</span><span class="va"><a href="https://pkgs.rstudio.com/rmarkdown/reference/html_vignette.html" class="external-link">html_vignette</a></span><span class="op">:</span></span>
-<span>    <span class="va">fig_caption</span><span class="op">:</span> <span class="va">yes</span></span></code></pre>
-<p>Then you can use the chunk option
-<code>fig.cap = "Your figure caption."</code> in
-<strong>knitr</strong>.</p>
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"BiosystemEngineeringLab-IITB/dures"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using GitHub PAT from the git credential store.</span></span>
+<span><span class="co">#&gt; Downloading GitHub repo BiosystemEngineeringLab-IITB/dures@HEAD</span></span>
+<span><span class="co">#&gt; Skipping 2 packages not available: Spectra, S4Vectors</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="color: #00BBBB;">R CMD build</span> <span style="color: #00BBBB;">─────────────────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; * checking for file ‘/tmp/RtmpkQToD8/remotes2fd9f73f5bb48f/BiosystemEngineeringLab-IITB-dures-716c5ed/DESCRIPTION’ ... OK</span></span>
+<span><span class="co">#&gt; * preparing ‘dures’:</span></span>
+<span><span class="co">#&gt; * checking DESCRIPTION meta-information ... OK</span></span>
+<span><span class="co">#&gt; * excluding invalid files</span></span>
+<span><span class="co">#&gt; Subdirectory 'R' contains invalid file names:</span></span>
+<span><span class="co">#&gt;   ‘Misc’</span></span>
+<span><span class="co">#&gt; * checking for LF line-endings in source and make files and shell scripts</span></span>
+<span><span class="co">#&gt; * checking for empty or unneeded directories</span></span>
+<span><span class="co">#&gt; * building ‘dures_0.0.0.1.tar.gz’</span></span>
+<span><span class="co">#&gt; Installing package into '/tmp/RtmpNuNyuS/temp_libpath26a0495b18576b'</span></span>
+<span><span class="co">#&gt; (as 'lib' is unspecified)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">dures</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="more-examples">More Examples<a class="anchor" aria-label="anchor" href="#more-examples"></a>
+<h2 id="first-test-example">First Test Example<a class="anchor" aria-label="anchor" href="#first-test-example"></a>
 </h2>
-<p>You can write math expressions, e.g. <span class="math inline">\(Y =
-X\beta + \epsilon\)</span>, footnotes<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>, and tables, e.g. using
-<code><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">knitr::kable()</a></code>.</p>
-<table style="width:100%;" class="table">
-<colgroup>
-<col width="25%">
-<col width="7%">
-<col width="5%">
-<col width="8%">
-<col width="5%">
-<col width="7%">
-<col width="8%">
-<col width="8%">
-<col width="4%">
-<col width="4%">
-<col width="7%">
-<col width="7%">
-</colgroup>
-<thead><tr class="header">
-<th align="left"></th>
-<th align="right">mpg</th>
-<th align="right">cyl</th>
-<th align="right">disp</th>
-<th align="right">hp</th>
-<th align="right">drat</th>
-<th align="right">wt</th>
-<th align="right">qsec</th>
-<th align="right">vs</th>
-<th align="right">am</th>
-<th align="right">gear</th>
-<th align="right">carb</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Mazda RX4</td>
-<td align="right">21.0</td>
-<td align="right">6</td>
-<td align="right">160.0</td>
-<td align="right">110</td>
-<td align="right">3.90</td>
-<td align="right">2.620</td>
-<td align="right">16.46</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">4</td>
-<td align="right">4</td>
-</tr>
-<tr class="even">
-<td align="left">Mazda RX4 Wag</td>
-<td align="right">21.0</td>
-<td align="right">6</td>
-<td align="right">160.0</td>
-<td align="right">110</td>
-<td align="right">3.90</td>
-<td align="right">2.875</td>
-<td align="right">17.02</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">4</td>
-<td align="right">4</td>
-</tr>
-<tr class="odd">
-<td align="left">Datsun 710</td>
-<td align="right">22.8</td>
-<td align="right">4</td>
-<td align="right">108.0</td>
-<td align="right">93</td>
-<td align="right">3.85</td>
-<td align="right">2.320</td>
-<td align="right">18.61</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">4</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">Hornet 4 Drive</td>
-<td align="right">21.4</td>
-<td align="right">6</td>
-<td align="right">258.0</td>
-<td align="right">110</td>
-<td align="right">3.08</td>
-<td align="right">3.215</td>
-<td align="right">19.44</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">Hornet Sportabout</td>
-<td align="right">18.7</td>
-<td align="right">8</td>
-<td align="right">360.0</td>
-<td align="right">175</td>
-<td align="right">3.15</td>
-<td align="right">3.440</td>
-<td align="right">17.02</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">Valiant</td>
-<td align="right">18.1</td>
-<td align="right">6</td>
-<td align="right">225.0</td>
-<td align="right">105</td>
-<td align="right">2.76</td>
-<td align="right">3.460</td>
-<td align="right">20.22</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">Duster 360</td>
-<td align="right">14.3</td>
-<td align="right">8</td>
-<td align="right">360.0</td>
-<td align="right">245</td>
-<td align="right">3.21</td>
-<td align="right">3.570</td>
-<td align="right">15.84</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">4</td>
-</tr>
-<tr class="even">
-<td align="left">Merc 240D</td>
-<td align="right">24.4</td>
-<td align="right">4</td>
-<td align="right">146.7</td>
-<td align="right">62</td>
-<td align="right">3.69</td>
-<td align="right">3.190</td>
-<td align="right">20.00</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">Merc 230</td>
-<td align="right">22.8</td>
-<td align="right">4</td>
-<td align="right">140.8</td>
-<td align="right">95</td>
-<td align="right">3.92</td>
-<td align="right">3.150</td>
-<td align="right">22.90</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">Merc 280</td>
-<td align="right">19.2</td>
-<td align="right">6</td>
-<td align="right">167.6</td>
-<td align="right">123</td>
-<td align="right">3.92</td>
-<td align="right">3.440</td>
-<td align="right">18.30</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">4</td>
-</tr>
-</tbody>
-</table>
-<p>Also a quote using <code>&gt;</code>:</p>
-<blockquote>
-<p>“He who gives up [code] safety for [code] speed deserves neither.”
-(<a href="https://twitter.com/hadleywickham/status/504368538874703872" class="external-link">via</a>)</p>
-</blockquote>
-</div>
-<div class="footnotes footnotes-end-of-document">
-<hr>
-<ol>
-<li id="fn1"><p>A footnote here.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-</ol>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Define the path to the test_1 folder (replace with the actual path on your system)</span></span>
+<span><span class="va">folder_path</span> <span class="op">&lt;-</span> <span class="st">"~/Desktop/test_package_dures/test_1/"</span></span>
+<span><span class="co"># Check if the directory exists</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.exists</a></span><span class="op">(</span><span class="va">folder_path</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"The directory 'test_1' does not exist. Please modify the path to the actual location of the 'test_1' folder."</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">l1</span> <span class="op">=</span> <span class="fu"><a href="../reference/preprocess.html">preprocess</a></span><span class="op">(</span>folder_path <span class="op">=</span> <span class="va">folder_path</span>, tol_mz <span class="op">=</span> <span class="fl">5</span>, tol_rt <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; *******************Sanity check for input files***********************</span></span>
+<span><span class="co">#&gt; ✓ Feature list file found!</span></span>
+<span><span class="co">#&gt; ✓ Feature list file has the correct columns</span></span>
+<span><span class="co">#&gt; ✓ mzml folder exists</span></span>
+<span><span class="co">#&gt; ✓ RT tolerance file exists! Using custom tolerance</span></span>
+<span><span class="co">#&gt; ✓ Input file is in correct format</span></span>
+<span><span class="co">#&gt; Reading mzml files</span></span>
+<span><span class="co">#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |                                                                      |   1%  |                                                                              |=                                                                     |   1%  |                                                                              |=                                                                     |   2%  |                                                                              |==                                                                    |   3%  |                                                                              |===                                                                   |   4%  |                                                                              |===                                                                   |   5%  |                                                                              |====                                                                  |   6%  |                                                                              |=====                                                                 |   7%  |                                                                              |=====                                                                 |   8%  |                                                                              |======                                                                |   8%  |                                                                              |======                                                                |   9%  |                                                                              |=======                                                               |  10%  |                                                                              |========                                                              |  11%  |                                                                              |========                                                              |  12%  |                                                                              |=========                                                             |  12%  |                                                                              |=========                                                             |  13%  |                                                                              |==========                                                            |  14%  |                                                                              |==========                                                            |  15%  |                                                                              |===========                                                           |  15%  |                                                                              |===========                                                           |  16%  |                                                                              |============                                                          |  17%  |                                                                              |=============                                                         |  18%  |                                                                              |=============                                                         |  19%  |                                                                              |==============                                                        |  19%  |                                                                              |==============                                                        |  20%  |                                                                              |===============                                                       |  21%  |                                                                              |===============                                                       |  22%  |                                                                              |================                                                      |  22%  |                                                                              |================                                                      |  23%  |                                                                              |=================                                                     |  24%  |                                                                              |==================                                                    |  25%  |                                                                              |==================                                                    |  26%  |                                                                              |===================                                                   |  27%  |                                                                              |===================                                                   |  28%  |                                                                              |====================                                                  |  28%  |                                                                              |====================                                                  |  29%  |                                                                              |=====================                                                 |  30%  |                                                                              |=====================                                                 |  31%  |                                                                              |======================                                                |  31%  |                                                                              |======================                                                |  32%  |                                                                              |=======================                                               |  33%  |                                                                              |========================                                              |  34%  |                                                                              |========================                                              |  35%  |                                                                              |=========================                                             |  35%  |                                                                              |=========================                                             |  36%  |                                                                              |==========================                                            |  37%  |                                                                              |==========================                                            |  38%  |                                                                              |===========================                                           |  38%  |                                                                              |===========================                                           |  39%  |                                                                              |============================                                          |  40%  |                                                                              |=============================                                         |  41%  |                                                                              |=============================                                         |  42%  |                                                                              |==============================                                        |  42%  |                                                                              |==============================                                        |  43%  |                                                                              |===============================                                       |  44%  |                                                                              |================================                                      |  45%  |                                                                              |================================                                      |  46%  |                                                                              |=================================                                     |  47%  |                                                                              |==================================                                    |  48%  |                                                                              |==================================                                    |  49%  |                                                                              |===================================                                   |  49%  |                                                                              |===================================                                   |  50%  |                                                                              |===================================                                   |  51%  |                                                                              |====================================                                  |  51%  |                                                                              |====================================                                  |  52%  |                                                                              |=====================================                                 |  53%  |                                                                              |======================================                                |  54%  |                                                                              |======================================                                |  55%  |                                                                              |=======================================                               |  56%  |                                                                              |========================================                              |  57%  |                                                                              |========================================                              |  58%  |                                                                              |=========================================                             |  58%  |                                                                              |=========================================                             |  59%  |                                                                              |==========================================                            |  60%  |                                                                              |===========================================                           |  61%  |                                                                              |===========================================                           |  62%  |                                                                              |============================================                          |  62%  |                                                                              |============================================                          |  63%  |                                                                              |=============================================                         |  64%  |                                                                              |=============================================                         |  65%  |                                                                              |==============================================                        |  65%  |                                                                              |==============================================                        |  66%  |                                                                              |===============================================                       |  67%  |                                                                              |================================================                      |  68%  |                                                                              |================================================                      |  69%  |                                                                              |=================================================                     |  69%  |                                                                              |=================================================                     |  70%  |                                                                              |==================================================                    |  71%  |                                                                              |==================================================                    |  72%  |                                                                              |===================================================                   |  72%  |                                                                              |===================================================                   |  73%  |                                                                              |====================================================                  |  74%  |                                                                              |====================================================                  |  75%  |                                                                              |=====================================================                 |  76%  |                                                                              |======================================================                |  77%  |                                                                              |======================================================                |  78%  |                                                                              |=======================================================               |  78%  |                                                                              |=======================================================               |  79%  |                                                                              |========================================================              |  80%  |                                                                              |========================================================              |  81%  |                                                                              |=========================================================             |  81%  |                                                                              |=========================================================             |  82%  |                                                                              |==========================================================            |  83%  |                                                                              |===========================================================           |  84%  |                                                                              |===========================================================           |  85%  |                                                                              |============================================================          |  85%  |                                                                              |============================================================          |  86%  |                                                                              |=============================================================         |  87%  |                                                                              |=============================================================         |  88%  |                                                                              |==============================================================        |  88%  |                                                                              |==============================================================        |  89%  |                                                                              |===============================================================       |  90%  |                                                                              |================================================================      |  91%  |                                                                              |================================================================      |  92%  |                                                                              |=================================================================     |  92%  |                                                                              |=================================================================     |  93%  |                                                                              |==================================================================    |  94%  |                                                                              |===================================================================   |  95%  |                                                                              |===================================================================   |  96%  |                                                                              |====================================================================  |  97%  |                                                                              |===================================================================== |  98%  |                                                                              |===================================================================== |  99%  |                                                                              |======================================================================|  99%  |                                                                              |======================================================================| 100%</span></span>
+<span><span class="co">#&gt;  ✓ Spectra has been extracted from the mzml files</span></span>
+<span><span class="co">#&gt; Concatenating and checking if MS2 data is available for a given feature</span></span>
+<span><span class="co">#&gt; MS2 spectra couldn't be extracted from a total of 33 features out of 50 features. They are as follows:3573,8433,7591,7791,5791,3366,2686,2589,8985,4897,6044,5333,7452,8134,5539,4848,5938,390,6713,7836,8643,8270,4318,8992,7629,7098,4060,1069,2144,7427,719,6001,654</span></span></code></pre></div>
 </div>
   </div>
 
@@ -334,7 +213,7 @@ X\beta + \epsilon\)</span>, footnotes<a href="#fn1" class="footnote-ref" id="fnr
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by First Last.</p>
+<p>Developed by Shayantan Banerjee.</p>
 </div>
 
 <div class="pkgdown">

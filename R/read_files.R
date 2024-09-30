@@ -1,11 +1,11 @@
 #' read_files
 #'
 #' Helper function for preprocess(). Need not be run separately. Runs several checks to see if features file has required columns or if user-defined features file has been provided
-#'
+#' Two options are available for inputting feature list from the user. First, the file titled feature_list.txt must be present in the folder_path with the columns "ID", "mz" and "RT". Second, if an additional file titled Sample-and-feature-wise-RT-tolerance.txt is present, it should contain the same number of rows and double the number of columns (RT_min_ and RT_max_ for every sample) as feature_list.txt.
 #' @param folder_path: same folder path used in preprocess(). The extracted fragment-grouped spectra in .txt format will be stored here
 #' @importFrom utils read.delim
 #' @param tol_mz: mass tolerance (default: 0.05 Da)
-#' @param tol_rt; Rt tolerance (default: 0.1667 minutes)
+#' @param tol_rt: Rt tolerance (default: 0.1667 minutes)
 #' @return a list containing all MS2 spectra for every sample, an edited feature list file for subsequent steps and names of samples analyzed
 #' @examples
 #' # Example usage of the function
@@ -37,9 +37,9 @@ read_files <- function(folder_path, tol_mz, tol_rt){
     stop("mzml folder not found. pls check if you have named your folder mzml_files/")
   }
 
-  if(file.exists(paste(folder_path, "Sample-and_feature-wise-RT-tolerance.txt",sep=""))){
+  if(file.exists(paste(folder_path, "Sample-and-feature-wise-RT-tolerance.txt",sep=""))){
     cat("\u2713 RT tolerance file exists! Using custom tolerance\n")
-    RT_tolerance = read.delim(paste(folder_path, "Sample-and_feature-wise-RT-tolerance.txt",sep=""),check.names = FALSE)
+    RT_tolerance = read.delim(paste(folder_path, "Sample-and-feature-wise-RT-tolerance.txt",sep=""),check.names = FALSE)
     if(dim(RT_tolerance)[2] == 2*length(fls)){
       cat("\u2713 Input file is in correct format\n")
     }
@@ -87,11 +87,11 @@ read_files <- function(folder_path, tol_mz, tol_rt){
 
   # Initialize the progress bar
   pb <- utils::txtProgressBar(min = 0, max = length(fls), style = 3)
-
+  backend <- Spectra::MsBackendMzR()
   # Loop over the files
   for (i in seq_along(fls)) {
-    print(i)
-    sps <- Spectra::Spectra(file.path(path_to_mzml_folder, fls[i]), source = Spectra::MsBackendMzR())
+    #print(i)
+    sps <- Spectra::Spectra(file.path(path_to_mzml_folder, fls[i]), source = backend)
     sps = Spectra::filterMsLevel(sps, msLevel = 2)
     if(length(sps) != 0){
       #sps$spectrumId = paste("scan_",seq(1,length(sps)), sep="")
@@ -131,7 +131,7 @@ read_files <- function(folder_path, tol_mz, tol_rt){
     names(spectral_files) = fls
   }
 
-  cat("\u2713 Spectra has been extracted from the mzml files")
+  cat("\n \u2713 Spectra has been extracted from the mzml files\n")
   if(dir.exists(paste(folder_path, "R_objects/",sep="")) == FALSE){
     dir.create(paste(folder_path, "R_objects/",sep=""))
   }

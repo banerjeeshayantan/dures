@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>What the Package Does (One Line, Title Case) • dures</title>
+<title>Denoising Using Replicate Spectra • dures</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script><meta property="og:title" content="What the Package Does (One Line, Title Case)">
-<meta property="og:description" content="What the package does (one paragraph).">
+<script src="pkgdown.js"></script><meta property="og:title" content="Denoising Using Replicate Spectra">
+<meta property="og:description" content="Denoising tandem mass spectrometry data.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">dures</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.1</span>
       </span>
     </div>
 
@@ -68,12 +68,13 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="denoising-using-replicate-spectra-dures">Denoising Using Replicate Spectra (DuReS)<a class="anchor" aria-label="anchor" href="#denoising-using-replicate-spectra-dures"></a>
+<div class="page-header"><h1 id="denoising-using-replicate-spectra-dures">
+<ins>D</ins>enoising <ins>u</ins>sing <ins>Re</ins>plicate <ins>S</ins>pectra (DuReS)<a class="anchor" aria-label="anchor" href="#denoising-using-replicate-spectra-dures"></a>
 </h1></div>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>This package provides a set of easy-to-implement functions to denoise tandem mass spectrometry data. It requires a set of mzML files and a txt file containing feature information (from peak picking) such as the mz and RT as input and outputs a set of mzML files with the same number of features.</p>
+<p>This package provides a set of easy-to-implement functions to denoise tandem mass spectrometry data. It requires a set of mzML files and a txt file containing feature information (from peak picking), such as the mz and RT as input, and outputs a set of mzML files with the same number of features but containing denoised spectra.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -81,16 +82,21 @@
 <p>First, you need to install two dependencies from Bioconductor: S4Vectors and Spectra</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
-<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Spectra"</span>, <span class="st">"S4Vectors"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Spectra"</span>, <span class="st">"S4Vectors"</span>, <span class="st">"mzR"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>After this you can proceed with the installation of the development version of the package DuReS as follows:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"banerjeeshayantan/dures"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"BiosystemEngineeringLab-IITB/dures"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
 </h2>
-<p>Detailed documentation of the package is available <a href="https://banerjeeshayantan.github.io/dures/" class="external-link">here</a></p>
+<p>Detailed description of all the functions included within the package is available <a href="https://biosystemengineeringlab-iitb.github.io/dures/reference/index.html" class="external-link">here</a>. A vignette outlining how to run DuReS using several test datasets is available <a href="https://biosystemengineeringlab-iitb.github.io/dures/articles/dures-vignette.html" class="external-link">here</a>.</p>
+</div>
+<div class="section level2">
+<h2 id="test-datasets">Test Datasets<a class="anchor" aria-label="anchor" href="#test-datasets"></a>
+</h2>
+<p><a href="https://doi.org/10.5281/zenodo.13778168" class="external-link"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.13778168.svg" alt="DOI"></a></p>
 </div>
 <div class="section level2">
 <h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
@@ -98,7 +104,7 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#This step reads in the mzML files, prepares the stats.txt file in a format that extracts MS2 spectra and returns a list</span></span>
 <span><span class="va">folder_path</span> <span class="op">=</span> <span class="st">"~/metabolomics/test_1/"</span> <span class="co">#folder path containing mzml/ and Stats.txt in required format</span></span>
-<span><span class="va">l1</span> <span class="op">=</span> <span class="fu"><a href="reference/preprocess.html">preprocess</a></span><span class="op">(</span>folder_path <span class="op">=</span> <span class="va">folder_path</span>, ppm <span class="op">=</span> <span class="fl">5</span>, tol_rt <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="co">#reads mzml files, prepares Stats file, extracts spectra and concatenates spectra</span></span>
+<span><span class="va">l1</span> <span class="op">=</span> <span class="fu"><a href="reference/preprocess.html">preprocess</a></span><span class="op">(</span>folder_path <span class="op">=</span> <span class="va">folder_path</span>, tol_mz <span class="op">=</span> <span class="fl">5</span>, tol_rt <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="co">#reads mzml files, prepares Stats file, extracts spectra and concatenates spectra</span></span>
 <span></span>
 <span><span class="co">#This step extracts the top 80% TIC spectra and groups fragments within a given mass tolerance</span></span>
 <span><span class="va">l2</span> <span class="op">=</span> <span class="fu"><a href="reference/extract_raw_spectra.html">extract_raw_spectra</a></span><span class="op">(</span>folder_path <span class="op">=</span> <span class="va">folder_path</span>, <span class="va">l1</span>, <span class="fl">0.05</span>, <span class="fl">0.8</span><span class="op">)</span> <span class="co">#extract top x% (where x = 0.8) TIC spectra, groups fragments within a given tolerance (0.05 Da)</span></span>
@@ -115,14 +121,14 @@
 <div class="section level2">
 <h2 id="package-workflow">Package Workflow<a class="anchor" aria-label="anchor" href="#package-workflow"></a>
 </h2>
-<div class="figure">
-<img src="https://raw.githubusercontent.com/banerjeeshayantan/test_read_the_docs_tut/main/dures_workflow.png" alt=""><p class="caption">Workflow Diagram</p>
+<div class="float">
+<img src="https://raw.githubusercontent.com/banerjeeshayantan/test_read_the_docs_tut/main/dures_workflow.png" alt="Workflow Diagram"><div class="figcaption">Workflow Diagram</div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
-<p>Please cite the following paper if you use our package</p>
+<p>DuReS: An R package for denoising experimental tandem mass spectrometry-based metabolomics data Shayantan Banerjee, Prajval Nakrani, Aviral Singh, Pramod Wangikar bioRxiv 2024.09.16.613198; doi: <a href="https://doi.org/10.1101/2024.09.16.613198" class="external-link uri">https://doi.org/10.1101/2024.09.16.613198</a></p>
 </div>
 </div>
   </div>
@@ -131,7 +137,8 @@
     <div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li>`use_mit_license()`, `use_gpl3_license()` or friends to pick a license</li>
+<li><a href="LICENSE.html">Full license</a></li>
+<li><small><a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
 </ul>
 </div>
 
@@ -146,7 +153,7 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>First Last <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/YOUR-ORCID-ID" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Shayantan Banerjee <br><small class="roles"> Author, maintainer </small>  </li>
 </ul>
 </div>
 
@@ -158,7 +165,7 @@
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by First Last.</p>
+<p>Developed by Shayantan Banerjee.</p>
 </div>
 
 <div class="pkgdown">

@@ -1,12 +1,10 @@
 Package: dures
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Denoising Using Replicate Spectra
+Version: 0.0.0.1
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person("Shayantan", "Banerjee", , "banerjeeshayantan@gmail.com", role = c("aut", "cre"))
+Description: Denoising tandem mass spectrometry data.
+License: MIT + file LICENSE
 Imports:
   dplyr,
   pbapply,
@@ -16,7 +14,10 @@ Imports:
   S4Vectors,
   Spectra
 Suggests:
-  BiocManager
+  BiocManager,
+  knitr,
+  markdown
 Encoding: UTF-8
+VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
