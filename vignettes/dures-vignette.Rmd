@@ -1,6 +1,6 @@
 ---
 title: "Demonstration of the package dures"
-author: "Shayantan Banerje\e"
+author: "Shayantan Banerjee"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -62,7 +62,21 @@ library(mzR)
 ```
 
 ## First Test Example
-This test dataset can be downloaded from the data deposited at [Zenodo](https://zenodo.org/records/13778168) (folder name: test_1/). The first step of the workflow focuses on reading mzML files, extracting MS/MS spectra within the specified mz and RT tolerance and concatenating all the replicate spectra for a given feature. The features for which no MS/MS spectra could be extracted given the RT and mz tolerance are removed from the list. 
+## Test Dataset
+
+The test dataset can be downloaded from the data deposited at [Zenodo](https://zenodo.org/records/13778168) (folder name: `test_1/`).
+
+### Workflow Overview
+
+1. **Reading mzML Files**  
+   The first step of the workflow involves reading mzML files and extracting MS/MS spectra within the specified *m/z* and *RT* tolerance.
+
+2. **Extracting and Concatenating Spectra**  
+   The extracted spectra are then concatenated for all replicate spectra belonging to a given feature.
+
+3. **Filtering Features**  
+   Features that do not have any MS/MS spectra extracted, based on the specified *RT* and *m/z* tolerance, are removed from the list.
+
 ```{r, execute first step of the workflow}
 # Define the path to the test_1 folder (replace with the actual path on your system)
 folder_path <- "~/Desktop/test_package_dures/test_1/"
@@ -72,7 +86,20 @@ if (!dir.exists(folder_path)) {
 }
 l1 = preprocess(folder_path = folder_path, tol_mz = 5, tol_rt = 0.1)
 ```
-`l1` is a list containing two elements: `stats_file_ms2_only` containing a dataframe with the MS/MS feature information - `ID, mz, RT, mz_up, mz_down and RT_tolerance` (for every samples) and `spectra_ms2_only` containing an Spectra object with the replicate spectra concatenated for every feature. Let us look at the concatenated spectra for the first feature.
+`l1` is a list containing two elements:
+
+1. **`stats_file_ms2_only`**: This element contains a dataframe with MS/MS feature information, including:
+   - **ID**: Feature identifier
+   - **mz**: Mass-to-charge ratio
+   - **RT**: Retention time
+   - **mz_up**: Upper mass-to-charge limit
+   - **mz_down**: Lower mass-to-charge limit
+   - **RT_tolerance**: Retention time tolerance for each sample
+
+2. **`spectra_ms2_only`**: This element contains a `Spectra` object with the replicate spectra concatenated for each feature.
+
+Now, let us examine the concatenated spectra for the **first feature**.
+
 
 ```{r first element}
 cat("name of first feature\n")
@@ -84,40 +111,325 @@ cat("name of third feature\n")
 names(l1$spectra_ms2_only)[3] #name of the first feature
 l1$spectra_ms2_only[[3]]
 ```
-From the output we can see that the first two MS2 features `1982` and `872` has 83 and 43 MS/MS spectra from different samples listed in `file(s)` section of the output. We can quickly take a look at the peak information of the first two out of the 83 raw MS/MS spectra using the `peaksData()` command. Please make sure the Spectra package in loaded in your workspace.
+From the output, we can see that the first two MS2 features (`1982` and `872`) have **83** and **43** MS/MS spectra, respectively, from different samples listed in the `file(s)` section of the output.
+
+We can quickly take a look at the peak information of the first two out of the 83 raw MS/MS spectra using the `peaksData()` command. Please ensure that the **Spectra** package is loaded in your workspace.
+
 
 ```{r peaksdata}
 peaksData(l1$spectra_ms2_only[[1]]$aggregate)[[1]] #first replicate spectrum
 peaksData(l1$spectra_ms2_only[[2]]$aggregate)[[1]] #second replicate spectrum
 ```
-It is also worth noting that we keep track of the individual spectrum in terms of the sample it is derived from. This is demonstrated as follows through the identities of the first 10 replicate spectra:
+
+### Tracking Individual Spectrum
+
+It is also worth noting that we keep track of each individual spectrum with respect to the sample from which it is derived. Below, we demonstrate this with the identities of the **first 10 replicate spectra**:
 
 ```{r spectrum identity}
 l1$spectra_ms2_only[[1]]$aggregate$spectrumId[1:10] #will be a vector of length 83
 ```
-For demonstration purposes, we will consider the first spectrum of the list named `20092020_CovidMild_P291_P_2.mzML_scan_1504`. This spectrum is derived from the sample `20092020_CovidMild_P291_P_2.mzML`. As we have seen in the previous code block, this spectrum has 19 fragments. Similarly, the second spectrum titled `20092020_CovidMild_P291_P_2.mzML_scan_1541` has 46 fragments. We will see in the end how many fragments remain in these two spectra after we apply fixed frequency cutoff to demonstrate the effect of denoising.  
+### Demonstration of Spectrum Analysis
 
-In the second step, we will use `l1` as input from the previous step and extract the top x% TIC spectra and groups fragments within a specified mass tolerance. The user can change the top x% TIC value and the mass tolerance (default is 0.8 or 80% and 0.05 Da). The length
+For demonstration purposes, we will consider the **first spectrum** from the list, named:
+
+> **`20092020_CovidMild_P291_P_2.mzML_scan_1504`**
+
+This spectrum is derived from the sample:
+
+> **`20092020_CovidMild_P291_P_2.mzML`**
+
+As seen in the previous code block, this spectrum contains **19 fragments**.
+
+Similarly, the **second spectrum**:
+
+> **`20092020_CovidMild_P291_P_2.mzML_scan_1541`**
+
+contains **46 fragments**.
+
+At the end of this demonstration, we will see how many fragments remain in these two spectra after applying a **fixed frequency cutoff** to illustrate the effect of **denoising**.
+
+---
+
+### Step 2: Extracting Top x% TIC Spectra and Grouping Fragments
+
+In the second step, we will use `l1` from the previous step as input to:
+
+1. **Extract the top x% TIC spectra**, and
+2. **Group fragments** within a specified **mass tolerance**.
+
+The user can modify the following parameters:
+- **Top x% TIC value**: Default is **80%** (i.e., **0.8**).
+- **Mass tolerance**: Default is **0.05 Da**.
+
+---
+
 
 ```{r second step}
 l2 = extract_raw_spectra(folder_path = folder_path, l1, 0.05, 0.8)
 ```
-For the same number of MS/MS features present in `l1`, the output from the second step `l2` contain three components - the top x% TIC spectra titled `sps_top_tic_2` (in Spectra format), a dataframe `df` containing the number of spectra before and after applying the top x% TIC cutoff and a vector containing features for which no spectra could be extracted. Let us look at the first and third rows of `df` and the number of spectra for the first and third feature after applying the TIC cutoff. The feature IDs are `1982` and `872` respectively. 
+The following code checks to ensure that the object `sps_top80_tic_2` is available in the local environment. This is not required while running the package
+
+```{r check_and_assign, echo=TRUE, error=TRUE}
+# Check if 'sps_top80_tic_2' exists before assigning
+if (!exists("sps_top80_tic_2")) {
+  stop("Object 'sps_top80_tic_2' not found in the environment.")
+} else {
+  assign("sps_top80_tic_2", sps_top80_tic_2, envir = .dures_env)
+}
+```
+### Step 2 Output Overview
+
+For the same number of MS/MS features present in `l1`, the output from the second step (`l2`) contains three components:
+
+1. **Top x% TIC Spectra**:  
+   Stored as `sps_top_tic_2` in **Spectra** format.
+  
+2. **Dataframe** (`df`):  
+   Contains the number of spectra **before** and **after** applying the top x% TIC cutoff.
+
+3. **Vector of Features without Extracted Spectra**:  
+   Contains the feature IDs for which no spectra could be extracted.
+
+### Exploring the Data
+
+#### 1. Viewing Specific Rows of Dataframe `df`
+
+Let's look at the **first** and **third rows** of `df`and the number of spectra after applying top x% TIC cutoff:
+
 
 ```{r intra}
 l2$df[c(1,3),]
 print(l2$sps_top_tic_2[[1]]) # From 83 before to 66 spectra after after top x% TIC
 print(l2$sps_top_tic_2[[3]]) # From 43 before to 34 spectra remain after top x% TIC
 ```
-We will also take a look at the peak value for the first two spectra belonging to the feature ID `1982`. Due the intra-spectra grouping, we can clearly see a reduction in the number of peaks. But before that, we need to check the identity of the spectra to make sure we are comparing the same spectra before and after step 2 of the analysis.
+
+### Exploring the Spectra Sizes
+
+We will examine the **size** of the **first** and **third spectra** belonging to feature IDs `1982` and `872`, respectively.
+
+#### Intra-Spectrum Grouping
+
+- We performed **intra-spectrum grouping**, meaning that fragments within a default tolerance of **0.05 Da** of one another were merged:
+  - **Mean of m/z** values.
+  - **Sum of intensities**.
+
+- The resulting spectra are stored in the folder `MS2_scans_before_denoising`.
+
+- Due to intra-spectrum grouping, we can clearly see a **reduction in the number of peaks**.
+
+### Ensuring Consistency Before Comparison
+
+Before comparing the spectra **before and after Step 2** of the analysis, we need to check their **identity** to ensure we are comparing the **same spectra**.
+
+---
 
 ```{r compare_spectra}
 print(l1$spectra_ms2_only[[1]]$aggregate$spectrumId[1:10]) #spectra identities before step 2
 print(l2$sps_top_tic_2[[1]]$spectrumId[1:10]) #spectra identitied after x% TIC cutoff implementation in step 2
 ```
-It is clear from this output that some spectra has been eliminated owing to low TIC. Example, `20092020_CovidMild_P291_P_2.mzML_scan_1504` didn't exist after application of top 80% TIC cutoff. 
+### Interpretation of Step 2 Output
 
-```{r peaksdata_after_intra}
-peaksData(l2$sps_top_tic_2[[1]])[[1]] #first replicate spectrum
-peaksData(l2$sps_top_tic_2[[2]])[[1]] #second replicate spectrum
+It is clear from this output that some spectra have been eliminated due to low TIC. 
+
+- **Example**:  
+  The spectrum titled `20092020_CovidMild_P291_P_2.mzML_scan_1504` **did not exist** after applying the top 80% TIC cutoff.
+
+#### Exploring Feature 1982
+
+- For the **first feature**, `1982`, we will consider the spectrum titled `20092020_CovidMild_P294_P_2.mzML_scan_1587` (which is the **third on the list** above).
+
+- Let’s look at the **number of fragments before Step 2**:
+
+```{r peaksdata_before_intra}
+peaksData(l2$sps_top_tic_2[[1]][3])[[1]]
 ```
+### Intra-Spectrum Grouping Overview
+
+There are **23 fragments** before intra-spectrum grouping. Now, if we look at the same spectrum from the folder `MS2_scans_before_denoising`:
+
+- **Subfolder Name**: `1982`
+- **Text File Name**: `20092020_CovidMild_P294_P_2.mzML_scan_1587.txt`
+
+After intra-spectrum grouping, there are **22 fragments**.
+
+The fragments with m/z values **304.11557** and **304.15106** were combined into a single fragment after the intra-spectrum grouping process.
+
+
+```{r after_grouping}
+spectrum_size_after_grouping = read.delim("~/Desktop/test_package_dures/test_1/MS2_scans_before_denoising/1982/20092020_CovidMild_P294_P_2.mzML_scan_1587.txt")
+print(dim(spectrum_size_after_grouping)[1])
+```
+
+### Another example to demonstrate the effect of intra-spectrum grouping
+
+Similar observations were made for the metabolite ID `872` using the spectrum file:
+
+**`13092020_CovidMild_P282_P_2.mzML_scan_1120`**
+
+The analysis included:
+
+- **Original Number of Fragments**:
+  - Before grouping: `98` fragments.
+  
+- **Corresponding Entry Location**:
+  - The original fragments can be found in the folder: `MS2_scans_before_denoising`.
+
+- **Fragments After Grouping**:
+  - After grouping, the number of fragments reduced to `81`.
+
+This significant reduction from **98** to **81** fragments demonstrates the effectiveness of the grouping process.
+
+
+```{r another example}
+print(head(peaksData(l2$sps_top_tic_2[[3]][1])[[1]]))
+print(dim(peaksData(l2$sps_top_tic_2[[3]][1])[[1]])[1])
+```
+```{r after_grouping_1}
+spectrum_size_after_grouping = read.delim("~/Desktop/test_package_dures/test_1/MS2_scans_before_denoising/872/13092020_CovidMild_P282_P_2.mzML_scan_1120.txt")
+print(dim(spectrum_size_after_grouping)[1])
+```
+### Step 3: Consensus Spectrum Generation
+
+In the **third step**, a **consensus spectrum** is generated using the **top 80% TIC spectra**, and the corresponding **fragment frequencies** are calculated.
+
+- The **consensus spectrum**, also known as the **inter-spectrum aggregate**, is built using the same principle as the **intra-spectrum aggregate**.
+- The output from this step includes:
+  1. A **single spectrum per feature**.
+  2. The **peak frequencies** for each feature.
+
+```{r third step}
+l3 = call_aggregate(l2$sps_top_tic_2, 0.05, folder_path)
+```
+
+### Examining the Output of `l3`
+
+The output of `l3` contains the following components:
+
+1. **Aggregate Spectra**:  
+   Represented as a **Spectra object**.
+
+2. **Dataframe of Aggregate Spectra**:  
+   This dataframe includes:
+   - **Mean m/z**: The average m/z value of the spectra.
+   - **Mean Intensity**: The average intensity of the spectra.
+   - **Frequency**: The frequency of occurrence for each fragment.
+   - **Number of Fragments**: Before and after **inter- and intra-spectra grouping**.
+
+### Example: Feature `1982`
+
+Let’s consider the first feature with **feature ID `1982`** as an example to examine the output more closely.
+
+```{r inspect-l3}
+print(head(l3[[1]]$Df))
+print(dim(l3[[1]]$Df)[1])
+l3[[1]]$Mean #will return one consensus spectrum
+
+```
+The consensus spectrum built using top 80% TIC spectra for feature `1982` has 498 fragments. Every fragment contain the recurrence frequencies. Let's see some of the top recurrent fragments.
+
+```{r recur}
+l = l3[[1]]$Df
+print(head(l[order(l$Frequency, decreasing = TRUE),],10))
+```
+
+### Step 4: Labelling individual spectra for every feature
+
+### Step 4: Labeling Fragments of Top TIC Spectra
+
+Using the **recurrence frequencies** calculated in **Step 3**, we will now label the fragments of every **top TIC spectra** for a given feature.
+
+The output from this step is:
+
+- A **list** containing all spectra for a given feature.
+- The corresponding **fragment frequencies** for each labeled fragment.
+
+This labeling process provides insights into how often each fragment appears across all spectra, allowing for better analysis of fragment patterns within the **top TIC** data.
+
+
+```{r label_spec}
+l4 = label_individual_spectrum(l3, folder_path, 0.05)
+```
+
+### Inspecting Feature `1982`
+
+We will now inspect the **first feature** (`1982`) and check the corresponding **spectra** and their **fragment frequencies**.
+
+- The **number of spectra per feature** will be the same as in **Step 2**, where we retained only the **top x% TIC spectra**.
+
+- Let's also look at the specific feature named `20092020_CovidMild_P294_P_2.mzML_scan_1587`, as in **Step 2**.
+
+
+```{r check step4}
+print(length(l4[[1]]))
+print(names(l4[[1]][3]))
+print(l4[[1]][3])
+```
+
+### Overview of Fragment Recurrence
+
+We can observe **22 fragments** from the spectrum and their corresponding **frequency of recurrence**.
+
+### Next Steps
+
+In the next step, we will:
+
+1. **Apply a Fixed Frequency Cutoff**:  
+   - Denoise the data by retaining only those fragments that meet the cutoff criteria.
+
+2. **Aggregate All MS/MS Spectra**:  
+   - Combine all the spectra from the different samples.
+
+3. **Export the Results**:  
+   - Print the aggregated MS/MS spectra to a file for further analysis.
+   
+```{r last_step}
+l5 = generate_denoised_spectra(l4, folder_path, ion_mode = "pos") 
+```
+
+### Output Overview
+
+The output consists of **mzML format** files with only **denoised MS/MS features**. The output from `l5` contains:
+
+- mzML files saved in a folder named **`Denoised_spectra`**.
+
+### Checking Specific Spectrum Output
+
+We will:
+
+1. **Check the Size and Contents** of a Particular Spectrum
+   - Spectrum titled **'1587'**.
+   - From the sample **"20092020_CovidMild_P294_P_2"**.
+   - Feature ID: **`1982`**.
+   
+2. **Read the Spectrum from `Denoised_spectra` Folder**: 
+
+`denoised_spectrum <- read_mzML("Denoised_spectra/20092020_CovidMild_P294_P_2.mzML")`
+
+
+***Number of peaks before denoising***
+```{r eg}
+#20092020_CovidMild_P294_P_2.mzML_scan_1587
+backend = Spectra::MsBackendMzR()
+sps <- Spectra::Spectra("~/Desktop/test_package_dures/test_1/Denoised_spectra/20092020_CovidMild_P294_P_2.mzML", source = backend)
+print(peaksData(l2$sps_top_tic_2[[1]][3])[[1]])
+```
+
+***Number of peaks after intra-spectrum grouping and labelling individual peaks***
+
+```{r test 5}
+print(l4[[1]][3])
+```
+
+***Number of peaks remaining after applying fixed intensity threshold***
+
+```{r test 6}
+print(peaksData(sps)[[1]])
+```
+
+### Summary of Results
+
+After applying all **five steps** of the package, only **9 fragments** remained.
+
+The **mzML files** containing the cleaned MS/MS spectra are saved in the folder `Denoised_spectra`.
+
+These files can now be used for further analysis, such as **metabolite annotation**.
